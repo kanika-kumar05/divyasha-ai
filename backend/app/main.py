@@ -8,6 +8,7 @@ from app.models.user_model import User
 
 from app.routes.auth_routes import router as auth_router
 from app.routes.chat_routes import router as chat_router
+from app.models.chat_model import Chat
 
 Base.metadata.create_all(bind=engine)
 

@@ -1,12 +1,57 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import API from "../services/api"
 
 function Assistant() {
+    const navigate = useNavigate()
+
     const [message, setMessage] = useState("")
     const [messages, setMessages] = useState([])
+    const [user, setUser] = useState(null)
+
+    const fetchUserAndChats = async () => {
+        try {
+            const token = localStorage.getItem("token")
+
+            const userResponse = await API.get("/me", {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+
+            setUser(userResponse.data)
+
+            const chatsResponse = await API.get(`/chats/${userResponse.data.id}`)
+
+            const formattedChats = []
+
+            chatsResponse.data.forEach((chat) => {
+                formattedChats.push({
+                    sender: "user",
+                    text: chat.message
+                })
+
+                formattedChats.push({
+                    sender: "bot",
+                    text: chat.response
+                })
+            })
+
+            setMessages(formattedChats)
+
+        } catch (error) {
+            console.log(error)
+            localStorage.removeItem("token")
+            navigate("/login")
+        }
+    }
+
+    useEffect(() => {
+        fetchUserAndChats()
+    }, [])
 
     const sendMessage = async () => {
-        if (!message.trim()) return
+        if (!message.trim() || !user) return
 
         const userMsg = {
             sender: "user",
@@ -17,6 +62,7 @@ function Assistant() {
 
         try {
             const response = await API.post("/chat", {
+                user_id: user.id,
                 message: message
             })
 
@@ -43,7 +89,6 @@ function Assistant() {
 
     return (
         <div className="min-h-screen bg-gray-100 p-8">
-
             <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-6">
 
                 <h1 className="text-3xl font-bold text-blue-600">
@@ -51,7 +96,7 @@ function Assistant() {
                 </h1>
 
                 <p className="text-gray-600 mt-2">
-                    Ask me about medicines, memories, family, or daily help.
+                    {user ? `Chatting as ${user.name}` : "Loading user..."}
                 </p>
 
                 <div className="h-[400px] overflow-y-auto border rounded-xl p-4 mt-6 bg-gray-50">
@@ -110,7 +155,6 @@ function Assistant() {
                 </div>
 
             </div>
-
         </div>
     )
 }
