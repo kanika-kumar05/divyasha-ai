@@ -69,7 +69,10 @@ function Dashboard() {
 
             <div className="grid grid-cols-3 gap-6 mt-10">
 
-                <div className="bg-white p-6 rounded-2xl shadow-lg">
+                <div
+                    onClick={() => navigate("/reminders")}
+                    className="bg-white p-6 rounded-2xl shadow-lg cursor-pointer hover:shadow-xl"
+                >
                     <h2 className="text-xl font-bold">
                         Medicine Reminders
                     </h2>

@@ -5,10 +5,12 @@ from app.database.database import engine
 from app.database.database import Base
 
 from app.models.user_model import User
+from app.models.chat_model import Chat
+from app.models.medicine_model import Medicine
 
 from app.routes.auth_routes import router as auth_router
 from app.routes.chat_routes import router as chat_router
-from app.models.chat_model import Chat
+from app.routes.medicine_routes import router as medicine_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -24,6 +26,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(chat_router)
+app.include_router(medicine_router)
 
 @app.get("/")
 def home():

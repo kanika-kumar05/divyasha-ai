@@ -10,6 +10,7 @@ import Login from "./pages/Login"
 import Register from "./pages/Register"
 import Dashboard from "./pages/Dashboard"
 import Assistant from "./pages/Assistant"
+import Reminders from "./pages/Reminders"
 
 function ProtectedRoute({ children }) {
 
@@ -62,7 +63,17 @@ function App() {
                     }
                 />
 
+                <Route
+                    path="/reminders"
+                    element={
+                        <ProtectedRoute>
+                            <Reminders />
+                        </ProtectedRoute>
+                    }
+                />
+
             </Routes>
+
 
         </BrowserRouter>
     )
