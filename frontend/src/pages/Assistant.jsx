@@ -9,6 +9,8 @@ function Assistant() {
     const [messages, setMessages] = useState([])
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(false)
+    const [listening, setListening] = useState(false)
+    const [voiceMode, setVoiceMode] = useState(false)
 
     const fetchUserAndChats = async () => {
         try {
@@ -77,6 +79,31 @@ function Assistant() {
             }
 
             setMessages((prev) => [...prev, botMsg])
+            if (voiceMode) {
+                const speech = new SpeechSynthesisUtterance(
+                    response.data.reply
+                )
+
+                speech.lang = "en-US"
+                speech.rate = 0.95
+                speech.pitch = 1.2
+
+                const voices = window.speechSynthesis.getVoices()
+
+                const femaleVoice = voices.find(
+                    (voice) =>
+                        voice.name.includes("Female") ||
+                        voice.name.includes("Samantha") ||
+                        voice.name.includes("Zira") ||
+                        voice.name.includes("Google US English")
+                )
+
+                if (femaleVoice) {
+                    speech.voice = femaleVoice
+                }
+
+                window.speechSynthesis.speak(speech)
+            }
 
         } catch (error) {
             console.log(error)
@@ -113,6 +140,45 @@ function Assistant() {
         } catch (error) {
             console.log(error)
             alert("Failed to save memory")
+        }
+    }
+
+    const startListening = () => {
+
+        const SpeechRecognition =
+            window.SpeechRecognition ||
+            window.webkitSpeechRecognition
+
+        if (!SpeechRecognition) {
+            alert("Speech Recognition not supported")
+            return
+        }
+
+        const recognition = new SpeechRecognition()
+
+        recognition.lang = "en-US"
+
+        recognition.start()
+
+        setListening(true)
+
+        recognition.onresult = (event) => {
+
+            const transcript =
+                event.results[0][0].transcript
+
+            setMessage(transcript)
+            setVoiceMode(true)
+
+            setListening(false)
+        }
+
+        recognition.onerror = () => {
+            setListening(false)
+        }
+
+        recognition.onend = () => {
+            setListening(false)
         }
     }
 
@@ -203,6 +269,7 @@ function Assistant() {
                 </div>
 
                 <div className="flex gap-3 mt-4">
+
                     <input
                         type="text"
                         placeholder="Type your message..."
@@ -217,7 +284,21 @@ function Assistant() {
                     />
 
                     <button
-                        onClick={sendMessage}
+                        onClick={startListening}
+                        className={`w-14 h-14 flex items-center justify-center rounded-full text-white text-2xl shadow-lg transition-all duration-300 ${
+                            listening
+                                ? "bg-red-500 scale-110 animate-pulse"
+                                : "bg-gradient-to-r from-blue-500 to-indigo-600 hover:scale-105"
+                        }`}
+                    >
+                        🎤
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            setVoiceMode(false)
+                            sendMessage()
+                        }}
                         disabled={loading}
                         className={`px-6 rounded-xl text-white transition ${
                             loading
