@@ -11,6 +11,7 @@ import Register from "./pages/Register"
 import Dashboard from "./pages/Dashboard"
 import Assistant from "./pages/Assistant"
 import Reminders from "./pages/Reminders"
+import Timeline from "./pages/Timeline"
 
 function ProtectedRoute({ children }) {
 
@@ -68,6 +69,15 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <Reminders />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/timeline"
+                    element={
+                        <ProtectedRoute>
+                            <Timeline />
                         </ProtectedRoute>
                     }
                 />

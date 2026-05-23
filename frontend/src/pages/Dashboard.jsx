@@ -82,7 +82,10 @@ function Dashboard() {
                     </p>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl shadow-lg">
+                <div
+                    onClick={() => navigate("/timeline")}
+                    className="bg-white p-6 rounded-2xl shadow-lg cursor-pointer hover:shadow-xl"
+                >
                     <h2 className="text-xl font-bold">
                         Memory Timeline
                     </h2>
