@@ -26,6 +26,27 @@ def get_db():
     finally:
         db.close()
 
+def detect_emotion(message: str):
+
+    text = message.lower()
+
+    if any(word in text for word in ["sad", "lonely", "alone", "cry", "upset"]):
+        return "sad"
+
+    if any(word in text for word in ["scared", "afraid", "fear", "panic", "worried"]):
+        return "fear"
+
+    if any(word in text for word in ["happy", "good", "excited", "joy", "great"]):
+        return "happy"
+
+    if any(word in text for word in ["angry", "irritated", "mad", "annoyed"]):
+        return "angry"
+
+    if any(word in text for word in ["confused", "forgot", "forget", "lost"]):
+        return "confused"
+
+    return "neutral"
+
 
 @router.post("/chat")
 def chat(
@@ -35,6 +56,8 @@ def chat(
 
     # Search relevant past memories
     memories = search_memory(request.message)
+    
+    detected_emotion = detect_emotion(request.message)
 
     memory_context = ""
 
@@ -52,6 +75,9 @@ Your job:
 - provide emotional support
 - speak calmly and simply
 - use past memories only if they are relevant
+
+Detected user emotion:
+{detected_emotion}
 
 Relevant past memories:
 {memory_context}
@@ -79,7 +105,8 @@ Reply in a helpful and caring way.
         new_chat = Chat(
             user_id=request.user_id,
             message=request.message,
-            response=ai_reply
+            response=ai_reply,
+            emotion=detected_emotion
         )
 
         db.add(new_chat)
@@ -94,6 +121,7 @@ Reply in a helpful and caring way.
 
         return {
             "reply": ai_reply,
+            "emotion": detected_emotion,
             "used_memories": memories
         }
 

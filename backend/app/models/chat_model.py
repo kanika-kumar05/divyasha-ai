@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 
 from app.database.database import Base
 
+
 class Chat(Base):
 
     __tablename__ = "chats"
@@ -14,5 +15,7 @@ class Chat(Base):
     message = Column(String)
 
     response = Column(String)
+
+    emotion = Column(String, default="neutral")
 
     user = relationship("User")

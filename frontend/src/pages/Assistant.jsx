@@ -75,7 +75,8 @@ function Assistant() {
 
             const botMsg = {
                 sender: "bot",
-                text: response.data.reply
+                text: response.data.reply,
+                emotion: response.data.emotion
             }
 
             setMessages((prev) => [...prev, botMsg])
@@ -249,6 +250,11 @@ function Assistant() {
                                     }`}
                                 >
                                     {msg.text}
+                                {msg.sender === "bot" && msg.emotion && (
+                                    <p className="text-xs mt-2 text-gray-500">
+                                        Detected emotion: {msg.emotion}
+                                    </p>
+                                )}
                                 </div>
 
                                 {msg.sender === "user" && (
