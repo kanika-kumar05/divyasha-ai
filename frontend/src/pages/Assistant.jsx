@@ -125,23 +125,29 @@ function Assistant() {
     }
 
     const saveMemory = async (text) => {
-        if (!user) return
+    if (!user) return
 
-        try {
-            await API.post("/memories", {
-                user_id: user.id,
-                title: "Saved Memory",
-                content: text,
-                category: "general"
-            })
+    const category = prompt(
+    "Enter category: medicine, family, emotion, appointment, routine, health, emergency, sleep, food, exercise, memory, reminder, social, personal, general"
+)
 
-            alert("Memory remembered successfully")
+    if (!category) return
 
-        } catch (error) {
-            console.log(error)
-            alert("Failed to save memory")
-        }
+    try {
+        await API.post("/memories", {
+            user_id: user.id,
+            title: "Saved Memory",
+            content: text,
+            category: category.toLowerCase()
+        })
+
+        alert("Memory remembered successfully")
+
+    } catch (error) {
+        console.log(error)
+        alert("Failed to save memory")
     }
+}
 
     const startListening = () => {
 

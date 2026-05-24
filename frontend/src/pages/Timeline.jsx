@@ -4,26 +4,38 @@ import { useNavigate } from "react-router-dom"
 import API from "../services/api"
 
 function Timeline() {
-
     const navigate = useNavigate()
 
     const [user, setUser] = useState(null)
+    const [memories, setMemories] = useState([])
 
-    const [chats, setChats] = useState([])
+    const categoryStyles = {
+        medicine: { label: "💊 Medicine", color: "bg-green-100 text-green-700" },
+        family: { label: "👨‍👩‍👧 Family", color: "bg-purple-100 text-purple-700" },
+        emotion: { label: "😊 Emotion", color: "bg-pink-100 text-pink-700" },
+        appointment: { label: "📅 Appointment", color: "bg-yellow-100 text-yellow-700" },
+        routine: { label: "🏃 Routine", color: "bg-blue-100 text-blue-700" },
+        health: { label: "🩺 Health", color: "bg-red-100 text-red-700" },
+        emergency: { label: "🚨 Emergency", color: "bg-red-200 text-red-800" },
+        sleep: { label: "😴 Sleep", color: "bg-indigo-100 text-indigo-700" },
+        food: { label: "🍲 Food", color: "bg-orange-100 text-orange-700" },
+        exercise: { label: "🏋️ Exercise", color: "bg-teal-100 text-teal-700" },
+        memory: { label: "🧠 Memory", color: "bg-cyan-100 text-cyan-700" },
+        reminder: { label: "⏰ Reminder", color: "bg-amber-100 text-amber-700" },
+        social: { label: "💬 Social", color: "bg-sky-100 text-sky-700" },
+        personal: { label: "🌸 Personal", color: "bg-rose-100 text-rose-700" },
+        general: { label: "📌 General", color: "bg-gray-100 text-gray-700" }
+    }
 
     const fetchUserAndTimeline = async () => {
-
         try {
             const token = localStorage.getItem("token")
 
-            const userResponse = await API.get(
-                "/me",
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+            const userResponse = await API.get("/me", {
+                headers: {
+                    Authorization: `Bearer ${token}`
                 }
-            )
+            })
 
             setUser(userResponse.data)
 
@@ -31,13 +43,11 @@ function Timeline() {
                 `/memories/${userResponse.data.id}`
             )
 
-            setChats(memoriesResponse.data)
+            setMemories(memoriesResponse.data)
 
         } catch (error) {
             console.log(error)
-
             localStorage.removeItem("token")
-
             navigate("/login")
         }
     }
@@ -48,18 +58,16 @@ function Timeline() {
 
     return (
         <div className="min-h-screen bg-gray-100 p-8">
-
             <div className="max-w-5xl mx-auto">
 
                 <div className="flex justify-between items-center mb-8">
-
                     <div>
                         <h1 className="text-4xl font-bold text-blue-600">
                             Memory Timeline
                         </h1>
 
                         <p className="text-gray-600 mt-2">
-                            Memory journal for {user?.name}
+                            Important memories for {user?.name}
                         </p>
                     </div>
 
@@ -69,60 +77,52 @@ function Timeline() {
                     >
                         Back to Dashboard
                     </button>
-
                 </div>
 
-                {chats.length === 0 && (
-                    <div className="bg-white p-6 rounded-2xl shadow-lg text-gray-500">
-                        No memories found yet. Start chatting with Asha AI.
+                {memories.length === 0 && (
+                    <div className="bg-white p-8 rounded-2xl shadow-lg text-center">
+                        <p className="text-5xl mb-4">🧠</p>
+
+                        <h2 className="text-xl font-bold text-gray-700">
+                            No memories saved yet
+                        </h2>
+
+                        <p className="text-gray-500 mt-2">
+                            Save important moments from the AI Assistant.
+                        </p>
                     </div>
                 )}
 
                 <div className="space-y-6">
+                    {memories.map((memory) => {
+                        const style =
+                            categoryStyles[memory.category] ||
+                            categoryStyles.general
 
-                    {chats.map((chat) => (
+                        return (
+                            <div
+                                key={memory.id}
+                                className="bg-white p-6 rounded-2xl shadow-lg border-l-4 border-blue-600"
+                            >
+                                <span
+                                    className={`px-3 py-1 rounded-full text-sm font-semibold ${style.color}`}
+                                >
+                                    {style.label}
+                                </span>
 
-                        <div
-                            key={chat.id}
-                            className="bg-white p-6 rounded-2xl shadow-lg border-l-4 border-blue-600"
-                        >
-
-                            <div className="mb-4">
-
-                                <p className="text-sm text-gray-500">
-                                    Memory #{chat.id}
-                                </p>
-
-                                <h2 className="text-xl font-bold text-gray-800 mt-1">
-                                    User Memory
+                                <h2 className="text-xl font-bold text-gray-800 mt-4">
+                                    {memory.title}
                                 </h2>
 
-                                <p className="mt-2 text-gray-700 bg-blue-50 p-4 rounded-xl">
-                                    {chat.content}
+                                <p className="mt-3 text-gray-700 bg-gray-50 p-4 rounded-xl">
+                                    {memory.content}
                                 </p>
-
                             </div>
-
-                            <div>
-
-                                <h2 className="text-xl font-bold text-gray-800">
-                                    Category
-                                </h2>
-
-                                <p className="mt-2 text-gray-700 bg-gray-100 p-4 rounded-xl">
-                                    {chat.category}
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    ))}
-
+                        )
+                    })}
                 </div>
 
             </div>
-
         </div>
     )
 }
