@@ -4,33 +4,26 @@ import { useNavigate } from "react-router-dom"
 import API from "../services/api"
 
 function Reminders() {
-
     const navigate = useNavigate()
 
     const [user, setUser] = useState(null)
-
     const [medicines, setMedicines] = useState([])
 
     const [medicineName, setMedicineName] = useState("")
-
     const [dosage, setDosage] = useState("")
-
     const [reminderTime, setReminderTime] = useState("")
 
+    const [lastAlertTime, setLastAlertTime] = useState("")
+
     const fetchUserAndMedicines = async () => {
-
         try {
-
             const token = localStorage.getItem("token")
 
-            const userResponse = await API.get(
-                "/me",
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+            const userResponse = await API.get("/me", {
+                headers: {
+                    Authorization: `Bearer ${token}`
                 }
-            )
+            })
 
             setUser(userResponse.data)
 
@@ -41,39 +34,71 @@ function Reminders() {
             setMedicines(medicineResponse.data)
 
         } catch (error) {
-
             console.log(error)
-
             localStorage.removeItem("token")
-
             navigate("/login")
         }
     }
 
     useEffect(() => {
-
         fetchUserAndMedicines()
-
     }, [])
 
-    const addMedicine = async () => {
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const now = new Date()
 
-        if (!medicineName || !dosage || !reminderTime || !user) {
+            const currentTime =
+                now.getHours().toString().padStart(2, "0") +
+                ":" +
+                now.getMinutes().toString().padStart(2, "0")
+
+            medicines.forEach((medicine) => {
+                const alertKey = `${medicine.id}-${currentTime}`
+
+                if (
+                    medicine.reminder_time === currentTime &&
+                    !medicine.taken_status &&
+                    lastAlertTime !== alertKey
+                ) {
+                    alert(`⏰ Time to take ${medicine.medicine_name}`)
+
+                    const speech = new SpeechSynthesisUtterance(
+                        `Reminder. Time to take ${medicine.medicine_name}`
+                    )
+
+                    speech.lang = "en-US"
+                    speech.rate = 0.95
+
+                    window.speechSynthesis.speak(speech)
+
+                    setLastAlertTime(alertKey)
+                }
+            })
+        }, 10000)
+
+        return () => clearInterval(interval)
+
+    }, [medicines, lastAlertTime])
+
+    const addMedicine = async () => {
+        if (!medicineName.trim() || !dosage.trim() || !reminderTime) {
             alert("Please fill all fields")
             return
         }
 
-        try {
+        if (!user) {
+            alert("User not loaded. Please refresh the page.")
+            return
+        }
 
-            await API.post(
-                "/medicines",
-                {
-                    user_id: user.id,
-                    medicine_name: medicineName,
-                    dosage: dosage,
-                    reminder_time: reminderTime
-                }
-            )
+        try {
+            await API.post("/medicines", {
+                user_id: user.id,
+                medicine_name: medicineName,
+                dosage: dosage,
+                reminder_time: reminderTime
+            })
 
             setMedicineName("")
             setDosage("")
@@ -82,17 +107,13 @@ function Reminders() {
             fetchUserAndMedicines()
 
         } catch (error) {
-
             console.log(error)
-
             alert("Failed to add medicine")
         }
     }
 
     const toggleStatus = async (medicine) => {
-
         try {
-
             await API.put(
                 `/medicines/${medicine.id}/status`,
                 {
@@ -103,39 +124,28 @@ function Reminders() {
             fetchUserAndMedicines()
 
         } catch (error) {
-
             console.log(error)
-
             alert("Failed to update status")
         }
     }
 
     const deleteMedicine = async (medicineId) => {
-
         try {
-
-            await API.delete(
-                `/medicines/${medicineId}`
-            )
+            await API.delete(`/medicines/${medicineId}`)
 
             fetchUserAndMedicines()
 
         } catch (error) {
-
             console.log(error)
-
             alert("Failed to delete medicine")
         }
     }
 
     return (
-
         <div className="min-h-screen bg-gray-100 p-8">
-
             <div className="max-w-5xl mx-auto">
 
                 <div className="flex justify-between items-center mb-8">
-
                     <div>
                         <h1 className="text-4xl font-bold text-blue-600">
                             Medicine Reminders
@@ -152,17 +162,14 @@ function Reminders() {
                     >
                         Back to Dashboard
                     </button>
-
                 </div>
 
                 <div className="bg-white p-6 rounded-2xl shadow-lg mb-8">
-
                     <h2 className="text-2xl font-bold mb-4">
                         Add Medicine
                     </h2>
 
-                    <div className="grid grid-cols-3 gap-4">
-
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <input
                             type="text"
                             placeholder="Medicine Name"
@@ -185,36 +192,33 @@ function Reminders() {
                             value={reminderTime}
                             onChange={(e) => setReminderTime(e.target.value)}
                         />
-
                     </div>
+
+                    <p className="text-sm text-gray-500 mt-3">
+                        Use 24-hour time format. Example: 09:00 or 20:30
+                    </p>
 
                     <button
                         onClick={addMedicine}
-                        className="mt-5 bg-blue-600 text-white px-6 py-3 rounded-lg"
+                        className="mt-5 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
                     >
                         Add Medicine
                     </button>
-
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                     {medicines.length === 0 && (
-
                         <div className="bg-white p-6 rounded-2xl shadow-lg text-gray-500">
                             No medicines added yet.
                         </div>
                     )}
 
                     {medicines.map((medicine) => (
-
                         <div
                             key={medicine.id}
                             className="bg-white p-6 rounded-2xl shadow-lg"
                         >
-
                             <div className="flex justify-between items-start">
-
                                 <div>
                                     <h2 className="text-2xl font-bold text-gray-800">
                                         {medicine.medicine_name}
@@ -235,46 +239,35 @@ function Reminders() {
                                                 : "text-red-500"
                                         }`}
                                     >
-                                        {
-                                            medicine.taken_status
-                                                ? "Taken"
-                                                : "Pending"
-                                        }
+                                        {medicine.taken_status ? "Taken" : "Pending"}
                                     </p>
                                 </div>
 
                                 <button
                                     onClick={() => deleteMedicine(medicine.id)}
-                                    className="bg-red-500 text-white px-3 py-1 rounded-lg"
+                                    className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
                                 >
                                     Delete
                                 </button>
-
                             </div>
 
                             <button
                                 onClick={() => toggleStatus(medicine)}
                                 className={`mt-5 px-5 py-2 rounded-lg text-white ${
                                     medicine.taken_status
-                                        ? "bg-yellow-500"
-                                        : "bg-green-600"
+                                        ? "bg-yellow-500 hover:bg-yellow-600"
+                                        : "bg-green-600 hover:bg-green-700"
                                 }`}
                             >
-                                {
-                                    medicine.taken_status
-                                        ? "Mark Pending"
-                                        : "Mark Taken"
-                                }
+                                {medicine.taken_status
+                                    ? "Mark Pending"
+                                    : "Mark Taken"}
                             </button>
-
                         </div>
-
                     ))}
-
                 </div>
 
             </div>
-
         </div>
     )
 }
