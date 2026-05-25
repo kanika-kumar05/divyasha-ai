@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import API from "../services/api"
+import Layout from "../components/Layout"
 
 function Assistant() {
     const navigate = useNavigate()
@@ -60,7 +61,11 @@ function Assistant() {
 
         const userMsg = {
             sender: "user",
-            text: currentMessage
+            text: currentMessage,
+            time: new Date().toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+            })
         }
 
         setMessages((prev) => [...prev, userMsg])
@@ -76,7 +81,11 @@ function Assistant() {
             const botMsg = {
                 sender: "bot",
                 text: response.data.reply,
-                emotion: response.data.emotion
+                emotion: response.data.emotion,
+                time: new Date().toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                })
             }
 
             setMessages((prev) => [...prev, botMsg])
@@ -190,140 +199,163 @@ function Assistant() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 p-8">
-            <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-6">
+        <Layout>
+            <div className="p-8">
+                <div className="max-w-3xl mx-auto bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-white p-6">
 
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-3xl font-bold text-blue-600">
-                            Asha AI Assistant
-                        </h1>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-3xl font-bold text-blue-600">
+                                Asha AI Assistant
+                            </h1>
 
-                        <p className="text-gray-600 mt-2">
-                            {user ? `Chatting as ${user.name}` : "Loading user..."}
-                        </p>
-                    </div>
-
-                    <button
-                        onClick={clearChat}
-                        className="bg-red-50 text-red-600 px-4 py-2 rounded-lg hover:bg-red-100 transition"
-                    >
-                        Clear Screen
-                    </button>
-                </div>
-
-                <div className="h-[430px] overflow-y-auto border rounded-2xl p-5 mt-6 bg-gray-50">
-
-                    {messages.length === 0 && !loading && (
-                        <div className="text-center mt-28">
-                            <p className="text-5xl mb-4">🧠</p>
-                            <h2 className="text-xl font-semibold text-gray-700">
-                                No conversation yet
-                            </h2>
-                            <p className="text-gray-400 mt-2">
-                                Ask Asha AI about medicines, memories, family, or daily help.
+                            <p className="text-gray-600 mt-2">
+                                {user ? `Chatting as ${user.name}` : "Loading user..."}
                             </p>
                         </div>
-                    )}
 
-                    {messages.map((msg, index) => (
-                        <div
-                            key={index}
-                            className={`mb-5 flex ${
-                                msg.sender === "user"
-                                    ? "justify-end"
-                                    : "justify-start"
-                            }`}
+                        <button
+                            onClick={clearChat}
+                            className="bg-red-50 text-red-600 px-4 py-2 rounded-lg hover:bg-red-100 transition"
                         >
+                            Clear Screen
+                        </button>
+                    </div>
+
+                    <div className="h-[430px] overflow-y-auto border rounded-2xl p-5 mt-6 bg-white/60 backdrop-blur">
+
+                        {messages.length === 0 && !loading && (
+                            <div className="text-center mt-28">
+                                <p className="text-5xl mb-4">🧠</p>
+                                <h2 className="text-xl font-semibold text-gray-700">
+                                    No conversation yet
+                                </h2>
+                                <p className="text-gray-400 mt-2">
+                                    Ask Asha AI about medicines, memories, family, or daily help.
+                                </p>
+                            </div>
+                        )}
+
+                        {messages.map((msg, index) => (
                             <div
-                                className={`max-w-[75%] ${
+                                key={index}
+                                className={`mb-6 flex items-end gap-3 ${
                                     msg.sender === "user"
-                                        ? "items-end"
-                                        : "items-start"
-                                } flex flex-col`}
+                                        ? "justify-end"
+                                        : "justify-start"
+                                }`}
                             >
+                                {msg.sender === "bot" && (
+                                    <div className="w-9 h-9 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md">
+                                        🤖
+                                    </div>
+                                )}
+
                                 <div
-                                    className={`p-4 rounded-2xl shadow-sm leading-relaxed ${
+                                    className={`max-w-[75%] flex flex-col ${
                                         msg.sender === "user"
-                                            ? "bg-blue-600 text-white rounded-br-sm"
-                                            : "bg-white text-gray-800 border rounded-bl-sm"
+                                            ? "items-end"
+                                            : "items-start"
                                     }`}
                                 >
-                                    {msg.text}
-                                {msg.sender === "bot" && msg.emotion && (
-                                    <p className="text-xs mt-2 text-gray-500">
-                                        Detected emotion: {msg.emotion}
-                                    </p>
-                                )}
+                                    <div
+                                        className={`p-4 rounded-3xl shadow-sm leading-relaxed ${
+                                            msg.sender === "user"
+                                                ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-br-sm"
+                                                : "bg-white text-gray-800 border rounded-bl-sm"
+                                        }`}
+                                    >
+                                        {msg.text}
+
+                                        {msg.sender === "bot" && msg.emotion && (
+                                            <p className="text-xs mt-2 text-gray-500">
+                                                Emotion detected: {msg.emotion}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                                        <span>{msg.time || "now"}</span>
+
+                                        {msg.sender === "user" && (
+                                            <button
+                                                onClick={() => saveMemory(msg.text)}
+                                                className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full hover:bg-blue-100 transition"
+                                            >
+                                                🧠 Remember This
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {msg.sender === "user" && (
-                                    <button
-                                        onClick={() => saveMemory(msg.text)}
-                                        className="mt-2 text-xs bg-blue-50 text-blue-700 px-3 py-1 rounded-full hover:bg-blue-100 transition"
-                                    >
-                                        🧠 Remember This
-                                    </button>
+                                    <div className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center text-white shadow-md">
+                                        👤
+                                    </div>
                                 )}
                             </div>
-                        </div>
-                    ))}
+                        ))}
 
-                    {loading && (
-                        <div className="flex justify-start mb-4">
-                            <div className="bg-white border text-gray-600 px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm">
-                                <span className="mr-2">Asha AI is thinking</span>
-                                <span className="animate-pulse">...</span>
+                        {loading && (
+                            <div className="flex justify-start mb-6 items-end gap-3">
+                                <div className="w-9 h-9 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md">
+                                    🤖
+                                </div>
+
+                                <div className="bg-white border text-gray-600 px-5 py-3 rounded-3xl rounded-bl-sm shadow-sm">
+                                    <span className="mr-2">Asha is thinking</span>
+                                    <span className="animate-pulse">● ● ●</span>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
 
-                </div>
+                    </div>
 
-                <div className="flex gap-3 mt-4">
+                    <div className="flex gap-3 mt-4">
 
-                    <input
-                        type="text"
-                        placeholder="Type your message..."
-                        className="flex-1 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter") {
+                        <input
+                            type="text"
+                            placeholder="Type your message..."
+                            className="flex-1 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    sendMessage()
+                                }
+                            }}
+                        />
+
+                        <button
+                            onClick={startListening}
+                            className={`w-14 h-14 flex items-center justify-center rounded-full text-white text-2xl shadow-lg transition-all duration-300 ${
+                                listening
+                                    ? "bg-red-500 scale-110 animate-pulse"
+                                    : "bg-gradient-to-r from-blue-500 to-indigo-600 hover:scale-105"
+                            }`}
+                        >
+                            🎤
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                setVoiceMode(false)
                                 sendMessage()
-                            }
-                        }}
-                    />
+                            }}
+                            disabled={loading}
+                            className={`px-6 rounded-xl text-white transition ${
+                                loading
+                                    ? "bg-gray-400 cursor-not-allowed"
+                                    : "bg-blue-600 hover:bg-blue-700"
+                            }`}
+                        >
+                            {loading ? "Wait..." : "Send"}
+                        </button>
+                    </div>
 
-                    <button
-                        onClick={startListening}
-                        className={`w-14 h-14 flex items-center justify-center rounded-full text-white text-2xl shadow-lg transition-all duration-300 ${
-                            listening
-                                ? "bg-red-500 scale-110 animate-pulse"
-                                : "bg-gradient-to-r from-blue-500 to-indigo-600 hover:scale-105"
-                        }`}
-                    >
-                        🎤
-                    </button>
-
-                    <button
-                        onClick={() => {
-                            setVoiceMode(false)
-                            sendMessage()
-                        }}
-                        disabled={loading}
-                        className={`px-6 rounded-xl text-white transition ${
-                            loading
-                                ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-blue-600 hover:bg-blue-700"
-                        }`}
-                    >
-                        {loading ? "Wait..." : "Send"}
-                    </button>
                 </div>
-
             </div>
-        </div>
+        </Layout>
     )
 }
 

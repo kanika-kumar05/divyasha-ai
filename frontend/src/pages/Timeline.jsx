@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import API from "../services/api"
+import Layout from "../components/Layout"
 
 function Timeline() {
     const navigate = useNavigate()
@@ -64,89 +65,91 @@ function Timeline() {
     )
 
     return (
-        <div className="min-h-screen bg-gray-100 p-8">
-            <div className="max-w-5xl mx-auto">
+        <Layout>
+            <div className="p-8">
+                <div className="max-w-5xl mx-auto">
 
-                <div className="flex justify-between items-center mb-8">
-                    <div>
-                        <h1 className="text-4xl font-bold text-blue-600">
-                            Memory Timeline
-                        </h1>
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h1 className="text-4xl font-bold text-blue-600">
+                                Memory Timeline
+                            </h1>
 
-                        <p className="text-gray-600 mt-2">
-                            Important memories for {user?.name}
-                        </p>
+                            <p className="text-gray-600 mt-2">
+                                Important memories for {user?.name}
+                            </p>
+                        </div>
+
+                        <button
+                            onClick={() => navigate("/dashboard")}
+                            className="bg-gray-700 text-white px-5 py-2 rounded-lg"
+                        >
+                            Back to Dashboard
+                        </button>
                     </div>
 
-                    <button
-                        onClick={() => navigate("/dashboard")}
-                        className="bg-gray-700 text-white px-5 py-2 rounded-lg"
-                    >
-                        Back to Dashboard
-                    </button>
-                </div>
+                    {memories.length === 0 && (
+                        <div className="bg-white p-8 rounded-2xl shadow-lg text-center">
+                            <p className="text-5xl mb-4">🧠</p>
 
-                {memories.length === 0 && (
-                    <div className="bg-white p-8 rounded-2xl shadow-lg text-center">
-                        <p className="text-5xl mb-4">🧠</p>
+                            <h2 className="text-xl font-bold text-gray-700">
+                                No memories saved yet
+                            </h2>
 
-                        <h2 className="text-xl font-bold text-gray-700">
-                            No memories saved yet
-                        </h2>
+                            <p className="text-gray-500 mt-2">
+                                Save important moments from the AI Assistant.
+                            </p>
+                        </div>
+                    )}
 
-                        <p className="text-gray-500 mt-2">
-                            Save important moments from the AI Assistant.
-                        </p>
+                    <div className="mb-6">
+                        <input
+                            type="text"
+                            placeholder="Search memories..."
+                            className="w-full p-4 rounded-2xl border shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
-                )}
 
-                <div className="mb-6">
-                    <input
-                        type="text"
-                        placeholder="Search memories..."
-                        className="w-full p-4 rounded-2xl border shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
+                    {filteredMemories.length === 0 && memories.length > 0 && (
+                        <div className="bg-white/90 backdrop-blur p-6 rounded-2xl shadow-lg border border-white text-center text-gray-500">
+                            No matching memories found.
+                        </div>
+                    )}
 
-                {filteredMemories.length === 0 && memories.length > 0 && (
-                    <div className="bg-white p-6 rounded-2xl shadow-lg text-center text-gray-500">
-                        No matching memories found.
-                    </div>
-                )}
+                    <div className="space-y-6">
+                        {filteredMemories.map((memory) => {
+                            const style =
+                                categoryStyles[memory.category] ||
+                                categoryStyles.general
 
-                <div className="space-y-6">
-                    {filteredMemories.map((memory) => {
-                        const style =
-                            categoryStyles[memory.category] ||
-                            categoryStyles.general
-
-                        return (
-                            <div
-                                key={memory.id}
-                                className="bg-white p-6 rounded-2xl shadow-lg border-l-4 border-blue-600"
-                            >
-                                <span
-                                    className={`px-3 py-1 rounded-full text-sm font-semibold ${style.color}`}
+                            return (
+                                <div
+                                    key={memory.id}
+                                    className="bg-white/90 backdrop-blur p-6 rounded-2xl shadow-lg border border-white border-l-4 border-blue-600"
                                 >
-                                    {style.label}
-                                </span>
+                                    <span
+                                        className={`px-3 py-1 rounded-full text-sm font-semibold ${style.color}`}
+                                    >
+                                        {style.label}
+                                    </span>
 
-                                <h2 className="text-xl font-bold text-gray-800 mt-4">
-                                    {memory.title}
-                                </h2>
+                                    <h2 className="text-xl font-bold text-gray-800 mt-4">
+                                        {memory.title}
+                                    </h2>
 
-                                <p className="mt-3 text-gray-700 bg-gray-50 p-4 rounded-xl">
-                                    {memory.content}
-                                </p>
-                            </div>
-                        )
-                    })}
+                                    <p className="mt-3 text-gray-700 bg-gray-50 p-4 rounded-xl">
+                                        {memory.content}
+                                    </p>
+                                </div>
+                            )
+                        })}
+                    </div>
+
                 </div>
-
             </div>
-        </div>
+        </Layout>
     )
 }
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import API from "../services/api"
+import Layout from "../components/Layout"
 
 function Dashboard() {
 
@@ -64,105 +65,102 @@ function Dashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 p-10">
+        <Layout>
+            <div className="p-10">
 
-            <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center">
 
-                <div>
-                    <h1 className="text-4xl font-bold text-blue-600">
-                        Asha AI Dashboard
-                    </h1>
+                    <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-3xl p-6 md:p-8 text-white shadow-2xl">
 
-                    <p className="text-gray-600 mt-2">
-                        Welcome, {user?.name}
-                    </p>
+                        <h1 className="text-3xl md:text-5xl font-bold">
+                            Welcome back, {user?.name} 👋
+                        </h1>
+
+                        <p className="mt-4 text-blue-100 text-lg">
+                            Your intelligent healthcare and memory companion.
+                        </p>
+
+                    </div>
+
                 </div>
 
-                <button
-                    onClick={handleLogout}
-                    className="bg-red-500 text-white px-5 py-2 rounded-lg"
-                >
-                    Logout
-                </button>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10">
 
-            </div>
+                    <div className="bg-white/90 backdrop-blur p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-white">
+                        <h2 className="text-gray-500 text-sm">Total Memories</h2>
+                        <p className="text-3xl font-bold text-blue-600 mt-2">
+                            {memoryCount}
+                        </p>
+                    </div>
 
-            <div className="grid grid-cols-4 gap-6 mt-10">
+                    <div className="bg-white/90 backdrop-blur p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-white">
+                        <h2 className="text-gray-500 text-sm">Medicines</h2>
+                        <p className="text-3xl font-bold text-green-600 mt-2">
+                            {medicineCount}
+                        </p>
+                    </div>
 
-                <div className="bg-white p-6 rounded-2xl shadow-lg">
-                    <h2 className="text-gray-500 text-sm">Total Memories</h2>
-                    <p className="text-3xl font-bold text-blue-600 mt-2">
-                        {memoryCount}
-                    </p>
+                    <div className="bg-white/90 backdrop-blur p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-white">
+                        <h2 className="text-gray-500 text-sm">Pending Medicines</h2>
+                        <p className="text-3xl font-bold text-red-500 mt-2">
+                            {pendingCount}
+                        </p>
+                    </div>
+
+                    <div className="bg-white/90 backdrop-blur p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-white">
+                        <h2 className="text-gray-500 text-sm">Emotion Memories</h2>
+                        <p className="text-3xl font-bold text-pink-500 mt-2">
+                            {emotionCount}
+                        </p>
+                    </div>
+
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl shadow-lg">
-                    <h2 className="text-gray-500 text-sm">Medicines</h2>
-                    <p className="text-3xl font-bold text-green-600 mt-2">
-                        {medicineCount}
-                    </p>
-                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
 
-                <div className="bg-white p-6 rounded-2xl shadow-lg">
-                    <h2 className="text-gray-500 text-sm">Pending Medicines</h2>
-                    <p className="text-3xl font-bold text-red-500 mt-2">
-                        {pendingCount}
-                    </p>
-                </div>
+                    <div
+                        onClick={() => navigate("/reminders")}
+                        className="bg-white/90 backdrop-blur p-6 rounded-2xl shadow-lg border border-white hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                    >
+                        <h2 className="text-xl font-bold">
+                            Medicine Reminders
+                        </h2>
 
-                <div className="bg-white p-6 rounded-2xl shadow-lg">
-                    <h2 className="text-gray-500 text-sm">Emotion Memories</h2>
-                    <p className="text-3xl font-bold text-pink-500 mt-2">
-                        {emotionCount}
-                    </p>
-                </div>
+                        <p className="text-gray-600 mt-2">
+                            Track daily medicines.
+                        </p>
+                    </div>
 
-            </div>
+                    <div
+                        onClick={() => navigate("/timeline")}
+                        className="bg-white/90 backdrop-blur p-6 rounded-2xl shadow-lg border border-white hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                    >
+                        <h2 className="text-xl font-bold">
+                            Memory Timeline
+                        </h2>
 
-            <div className="grid grid-cols-3 gap-6 mt-10">
+                        <p className="text-gray-600 mt-2">
+                            View daily memory logs.
+                        </p>
+                    </div>
 
-                <div
-                    onClick={() => navigate("/reminders")}
-                    className="bg-white p-6 rounded-2xl shadow-lg cursor-pointer hover:shadow-xl"
-                >
-                    <h2 className="text-xl font-bold">
-                        Medicine Reminders
-                    </h2>
+                    <div
+                        onClick={() => navigate("/assistant")}
+                        className="bg-white/90 backdrop-blur p-6 rounded-2xl shadow-lg border border-white hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                    >
+                        <h2 className="text-xl font-bold">
+                            AI Assistant
+                        </h2>
 
-                    <p className="text-gray-600 mt-2">
-                        Track daily medicines.
-                    </p>
-                </div>
+                        <p className="text-gray-600 mt-2">
+                            Ask memory-related questions.
+                        </p>
+                    </div>
 
-                <div
-                    onClick={() => navigate("/timeline")}
-                    className="bg-white p-6 rounded-2xl shadow-lg cursor-pointer hover:shadow-xl"
-                >
-                    <h2 className="text-xl font-bold">
-                        Memory Timeline
-                    </h2>
-
-                    <p className="text-gray-600 mt-2">
-                        View daily memory logs.
-                    </p>
-                </div>
-
-                <div
-                    onClick={() => navigate("/assistant")}
-                    className="bg-white p-6 rounded-2xl shadow-lg cursor-pointer hover:shadow-xl"
-                >
-                    <h2 className="text-xl font-bold">
-                        AI Assistant
-                    </h2>
-
-                    <p className="text-gray-600 mt-2">
-                        Ask memory-related questions.
-                    </p>
                 </div>
 
             </div>
-
-        </div>
+        </Layout>
     )
 }
 
