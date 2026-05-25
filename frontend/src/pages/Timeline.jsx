@@ -8,6 +8,7 @@ function Timeline() {
 
     const [user, setUser] = useState(null)
     const [memories, setMemories] = useState([])
+    const [searchTerm, setSearchTerm] = useState("")
 
     const categoryStyles = {
         medicine: { label: "💊 Medicine", color: "bg-green-100 text-green-700" },
@@ -56,6 +57,12 @@ function Timeline() {
         fetchUserAndTimeline()
     }, [])
 
+    const filteredMemories = memories.filter((memory) =>
+        memory.content
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
+    )
+
     return (
         <div className="min-h-screen bg-gray-100 p-8">
             <div className="max-w-5xl mx-auto">
@@ -93,8 +100,24 @@ function Timeline() {
                     </div>
                 )}
 
+                <div className="mb-6">
+                    <input
+                        type="text"
+                        placeholder="Search memories..."
+                        className="w-full p-4 rounded-2xl border shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+
+                {filteredMemories.length === 0 && memories.length > 0 && (
+                    <div className="bg-white p-6 rounded-2xl shadow-lg text-center text-gray-500">
+                        No matching memories found.
+                    </div>
+                )}
+
                 <div className="space-y-6">
-                    {memories.map((memory) => {
+                    {filteredMemories.map((memory) => {
                         const style =
                             categoryStyles[memory.category] ||
                             categoryStyles.general
