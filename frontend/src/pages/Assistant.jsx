@@ -14,41 +14,66 @@ function Assistant() {
     const [voiceMode, setVoiceMode] = useState(false)
 
     const fetchUserAndChats = async () => {
-        try {
-            const token = localStorage.getItem("token")
+    try {
 
-            const userResponse = await API.get("/me", {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
+        const token = localStorage.getItem("token")
 
-            setUser(userResponse.data)
+        const userResponse = await API.get("/me", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
 
-            const chatsResponse = await API.get(`/chats/${userResponse.data.id}`)
+        setUser(userResponse.data)
 
-            const formattedChats = []
+        const isChatCleared = localStorage.getItem(
+            `chatCleared_${userResponse.data.id}`
+        )
 
-            chatsResponse.data.forEach((chat) => {
-                formattedChats.push({
-                    sender: "user",
-                    text: chat.message
-                })
-
-                formattedChats.push({
-                    sender: "bot",
-                    text: chat.response
-                })
-            })
-
-            setMessages(formattedChats)
-
-        } catch (error) {
-            console.log(error)
-            localStorage.removeItem("token")
-            navigate("/login")
+        if (isChatCleared === "true") {
+            setMessages([])
+            return
         }
+
+        const chatsResponse = await API.get(
+            `/chats/${userResponse.data.id}`
+        )
+
+        const formattedChats = []
+
+        chatsResponse.data.forEach((chat) => {
+
+            formattedChats.push({
+                sender: "user",
+                text: chat.message,
+                time: new Date().toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                })
+            })
+
+            formattedChats.push({
+                sender: "bot",
+                text: chat.response,
+                emotion: chat.emotion,
+                time: new Date().toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                })
+            })
+        })
+
+        setMessages(formattedChats)
+
+    } catch (error) {
+
+        console.log(error)
+
+        localStorage.removeItem("token")
+
+        navigate("/login")
     }
+}
 
     useEffect(() => {
         fetchUserAndChats()
@@ -56,6 +81,7 @@ function Assistant() {
 
     const sendMessage = async () => {
         if (!message.trim() || !user || loading) return
+        localStorage.removeItem(`chatCleared_${user.id}`)
 
         const currentMessage = message
 
@@ -131,8 +157,16 @@ function Assistant() {
     }
 
     const clearChat = () => {
-        setMessages([])
-    }
+
+    if (!user) return
+
+    localStorage.setItem(
+        `chatCleared_${user.id}`,
+        "true"
+    )
+
+    setMessages([])
+}
 
     const saveMemory = async (text) => {
     if (!user) return
