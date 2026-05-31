@@ -30,6 +30,11 @@ function Assistant() {
             `chatCleared_${userResponse.data.id}`
         )
 
+        console.log(
+            "Chat cleared flag:",
+            localStorage.getItem(`chatCleared_${userResponse.data.id}`)
+        )
+
         if (isChatCleared === "true") {
             setMessages([])
             return
