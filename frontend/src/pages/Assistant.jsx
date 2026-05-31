@@ -342,7 +342,7 @@ function Assistant() {
                                 </div>
 
                                 <div className="bg-white border text-gray-600 px-5 py-3 rounded-3xl rounded-bl-sm shadow-sm">
-                                    <span className="mr-2">Asha is thinking</span>
+                                    <span className="mr-2">Divyasha is thinking</span>
                                     <span className="animate-pulse">● ● ●</span>
                                 </div>
                             </div>
