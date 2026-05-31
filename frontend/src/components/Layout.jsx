@@ -30,11 +30,11 @@ function Layout({ children }) {
                 <div>
                     <div className="mb-10">
                         <h1 className="text-3xl font-bold text-blue-600">
-                            Asha AI
+                            Divyasha
                         </h1>
 
                         <p className="text-sm text-gray-500 mt-1">
-                            Memory Companion
+                            Your Intelligent Memory Companion
                         </p>
                     </div>
 
@@ -71,7 +71,7 @@ function Layout({ children }) {
 
                     <div className="flex justify-between items-center mb-3">
                         <h1 className="text-xl font-bold text-blue-600">
-                            Asha AI
+                            Divyasha
                         </h1>
 
                         <button

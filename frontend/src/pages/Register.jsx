@@ -72,7 +72,7 @@ function Register() {
                         </h1>
 
                         <p className="text-gray-500 mt-2">
-                            Start your journey with Asha AI
+                            Start your journey with Divyasha
                         </p>
 
                     </div>

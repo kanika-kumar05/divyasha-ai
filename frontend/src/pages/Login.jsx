@@ -73,7 +73,7 @@ function Login() {
                         </h1>
 
                         <p className="text-gray-500 mt-2">
-                            Login to continue with Asha AI
+                            Login to continue with Divyasha
                         </p>
 
                     </div>
@@ -112,7 +112,7 @@ function Login() {
 
                     <p className="text-center text-gray-600 mt-6">
 
-                        New to Asha AI?{" "}
+                        New to Divyasha?{" "}
 
                         <button
                             onClick={() => navigate("/register")}

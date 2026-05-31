@@ -34,5 +34,5 @@ app.include_router(memory_router)
 @app.get("/")
 def home():
     return {
-        "message": "Asha AI Backend Running"
+        "message": "Divyasha Backend Running"
     }

@@ -245,7 +245,7 @@ function Assistant() {
                     <div className="flex justify-between items-center">
                         <div>
                             <h1 className="text-3xl font-bold text-blue-600">
-                                Asha AI Assistant
+                                Divyasha Assistant
                             </h1>
 
                             <p className="text-gray-600 mt-2">
@@ -270,7 +270,7 @@ function Assistant() {
                                     No conversation yet
                                 </h2>
                                 <p className="text-gray-400 mt-2">
-                                    Ask Asha AI about medicines, memories, family, or daily help.
+                                    Ask Divyasha about medicines, memories, family, or daily help.
                                 </p>
                             </div>
                         )}
